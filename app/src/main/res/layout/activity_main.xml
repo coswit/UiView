@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <!--    <HorizontalScrollView-->
@@ -34,6 +34,8 @@
 
 
         <com.coswit.View.GraphicView
+            android:paddingStart="10dp"
+            android:paddingEnd="5dp"
             android:id="@+id/gv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -43,7 +45,6 @@
             android:background="#fff" />
 
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="15dp"
@@ -53,5 +54,51 @@
             android:textSize="12sp" />
     </RelativeLayout>
 
+    <com.coswit.rebackScroll.ReboundHScrollView
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+       <LinearLayout
+           android:orientation="horizontal"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+
+           <TextView
+               android:text="text1"
+               android:layout_width="200dp"
+               android:background="#4CAF50"
+               android:layout_height="match_parent"/>
+           <TextView
+               android:text="text2"
+               android:layout_width="200dp"
+               android:background="#F44336"
+               android:layout_height="match_parent"/>
+           <TextView
+               android:text="text3"
+               android:layout_width="200dp"
+               android:background="#4CAF50"
+               android:layout_height="match_parent"/>
+           <TextView
+               android:text="text4"
+               android:layout_width="200dp"
+               android:background="#CDDC39"
+               android:layout_height="match_parent"/>
+           <TextView
+               android:text="text5"
+               android:layout_width="200dp"
+               android:background="#4CAF50"
+               android:layout_height="match_parent"/>
+           <TextView
+               android:text="text6"
+               android:layout_width="200dp"
+               android:background="#FF5722"
+               android:layout_height="match_parent"/>
+       </LinearLayout>
+    </com.coswit.rebackScroll.ReboundHScrollView>
+
+    <com.coswit.View.CircleNumView
+        android:id="@+id/cn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

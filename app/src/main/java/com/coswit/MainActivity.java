@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.coswit.View.CircleNumView;
 import com.coswit.View.GraphicView;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         GraphicView view = findViewById(R.id.gv);
         ArrayList<GraphicView.PointInfo> infos = new ArrayList<>();
-        for(int i = 0;i<12;i++) {
+        for(int i = 0;i<3;i++) {
             infos.add(new GraphicView.PointInfo("1月",45));
             infos.add(new GraphicView.PointInfo("2月",20));
             infos.add(new GraphicView.PointInfo("3月",12));
@@ -32,5 +33,9 @@ public class MainActivity extends AppCompatActivity {
             infos.add(new GraphicView.PointInfo("12月",59));
         }
         view.setData(infos,88);
+
+        CircleNumView cn = findViewById(R.id.cn);
+        cn.setText(CircleNumView.Type.middle,"44");
     }
+
 }
