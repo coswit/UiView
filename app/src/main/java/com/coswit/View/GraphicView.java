@@ -9,7 +9,6 @@ import android.graphics.PointF;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
@@ -92,6 +91,8 @@ public class GraphicView extends FrameLayout {
     private int mMinimumVelocity;
     private int mMaximumVelocity;
     int mOverflingDistance;
+    //最大回弹距离
+    private static final int OFF_SET = 200;
 
     public GraphicView(Context context) {
         this(context, null);
@@ -121,7 +122,7 @@ public class GraphicView extends FrameLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        mPaint.reset();
+        resetPaint();
         mPaint.setAntiAlias(true);
         mLWidth = dp2px(LINE_WITH);
         if (pointsInfo != null && pointsInfo.size() > 0) {
@@ -137,12 +138,13 @@ public class GraphicView extends FrameLayout {
 
             pointFList.clear();
             for (int i = 0; i < pointsInfo.size(); i++) {
-                mPaint.reset();
+                resetPaint();
                 PointInfo pointInfo = pointsInfo.get(i);
                 //字体绘制
                 mPaint.setColor(0xFF939CA5);
                 mPaint.setTextSize(descTSize);
                 mPaint.setTextAlign(Paint.Align.CENTER);
+
                 canvas.drawText(pointInfo.desc, px, bottomText, mPaint);
 
                 //坐标线绘制
@@ -155,7 +157,7 @@ public class GraphicView extends FrameLayout {
                 RadialGradient shadow = new RadialGradient(px, py, dp2px(8), mainColor, 0xFFFFFFFF, Shader.TileMode.CLAMP);
                 mPaint.setShader(shadow);
                 canvas.drawCircle(px, py, dp2px(8), mPaint);
-                mPaint.reset();
+                resetPaint();
                 mPaint.setColor(0xFFFFFFFF);
                 canvas.drawCircle(px, py, dp2px(6), mPaint);
                 mPaint.setColor(mainColor);
@@ -331,10 +333,7 @@ public class GraphicView extends FrameLayout {
                     if ((Math.abs(initialVelocity) > mMinimumVelocity)) {
                         fling(-initialVelocity);
                     } else {
-//                        if (mScroller.springBack(getScrollX(), getScrollY(), 0,
-//                                getScrollRange(), 0, 0)) {
-//                            postInvalidateOnAnimation();
-//                        }
+                        //处理回弹
                         if (getScrollX() < 0) {
                             scrollTo(0, getScrollY());
                         } else if (getScrollX() > getScrollRange()) {
@@ -352,7 +351,10 @@ public class GraphicView extends FrameLayout {
         return true;
     }
 
-
+    private void resetPaint() {
+        mPaint.reset();
+        mPaint.setAntiAlias(true);
+    }
     private void initScroll() {
         final ViewConfiguration configuration = ViewConfiguration.get(mContext);
         mScroller = new OverScroller(getContext());
@@ -393,7 +395,6 @@ public class GraphicView extends FrameLayout {
 
     //处理惯性滑动
     public void fling(int velocityX) {
-        Log.i(TAG, "fling: ");
         mScroller.fling(getScrollX(), getScrollY(), velocityX, 0, 0,
                 getScrollRange(), 0, 0, getScrollRange() / 2, 0);
     }
@@ -416,7 +417,7 @@ public class GraphicView extends FrameLayout {
     @Override
     protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
         if (isTouchEvent) {
-            maxOverScrollX += 200;
+            maxOverScrollX += OFF_SET;
         }
         return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
     }
@@ -424,23 +425,15 @@ public class GraphicView extends FrameLayout {
 
     @Override
     protected int computeHorizontalScrollRange() {
-        int scrollRange = getScrollRange();
-        final int scrollX = getScrollX();
-        Log.i(TAG, "scrollX: " + scrollX
-                + "   scrollRange:" + scrollRange
-        );
+        int scrollX = getScrollX();
+        int width = getWidth();
         if (scrollX <= 0) {
-            return 100;
+            return width - scrollX + OFF_SET;
         } else if (scrollX >= getScrollRange()) {
-            return 100;
+            return width + scrollX;
         }
-        return 50;
+        return width;
     }
 
 
-    @Override
-    protected int computeHorizontalScrollExtent() {
-//        return super.computeHorizontalScrollExtent();
-        return 80;
-    }
 }
