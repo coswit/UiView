@@ -299,11 +299,16 @@ public class GraphicView extends View {
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 initOrResetVelocityTracker();
+                if ((mIsBeingDragged = !mScroller.isFinished())) {
+                    final ViewParent parent = getParent();
+                    if (parent != null) {
+                        parent.requestDisallowInterceptTouchEvent(true);
+                    }
+                }
                 /*
                  * If being flinged and user touches, stop the fling. isFinished
                  * will be false if being flinged.
                  */
-                mIsBeingDragged = !mScroller.isFinished();
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
