@@ -11,10 +11,10 @@ import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
-import android.widget.OverScroller;
+import android.widget.Scroller;
 
 import androidx.annotation.Nullable;
 
@@ -26,12 +26,12 @@ import static androidx.customview.widget.ViewDragHelper.INVALID_POINTER;
 /**
  * @author Created by zhengjing on 2019-10-18.
  */
-public class GraphicView extends FrameLayout {
+public class GraphicView extends View {
 
     /**
      * 主填充色
      */
-    private final int mainColor = 0xFF008AFF;
+    private int mainColor = 0xFF008AFF;
     private Paint mPaint;
     private Context mContext;
     /**
@@ -48,7 +48,7 @@ public class GraphicView extends FrameLayout {
      * text 距离坐标线的距离dp
      */
     private int textTopDistance = 8;
-    private float maxValue = 20;
+    private Number maxValue = 20;
 
     private Path mPath;
 
@@ -87,7 +87,7 @@ public class GraphicView extends FrameLayout {
     private int mOverscrollDistance;
     private boolean mIsBeingDragged;
     private VelocityTracker mVelocityTracker;
-    private OverScroller mScroller;
+    private Scroller mScroller;
     private int mMinimumVelocity;
     private int mMaximumVelocity;
     int mOverflingDistance;
@@ -115,7 +115,7 @@ public class GraphicView extends FrameLayout {
         textTopDistance = dp2px(textTopDistance);
         descTSize = sp2px(descTSize);
         distance = dp2px(distance);
-
+//        mainColor = CommonUtil.getColor(R.color.blue);
         initScroll();
     }
 
@@ -123,7 +123,6 @@ public class GraphicView extends FrameLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         resetPaint();
-        mPaint.setAntiAlias(true);
         mLWidth = dp2px(LINE_WITH);
         if (pointsInfo != null && pointsInfo.size() > 0) {
             int px = getPaddingStart();
@@ -133,7 +132,13 @@ public class GraphicView extends FrameLayout {
             int bottomLine = measuredHeight - descTSize - textTopDistance - getPaddingBottom();
 
             int lineHeight = bottomLine - topLine;
-            float ratio = lineHeight / maxValue;
+            double ratio;
+            if (maxValue.doubleValue() <= 0) {
+                ratio = 0;
+            } else {
+                ratio = lineHeight / maxValue.doubleValue();
+
+            }
             float bottomText = measuredHeight - getPaddingBottom();
 
             pointFList.clear();
@@ -144,14 +149,14 @@ public class GraphicView extends FrameLayout {
                 mPaint.setColor(0xFF939CA5);
                 mPaint.setTextSize(descTSize);
                 mPaint.setTextAlign(Paint.Align.CENTER);
-
                 canvas.drawText(pointInfo.desc, px, bottomText, mPaint);
 
                 //坐标线绘制
                 mPaint.setColor(0xFFF7F7F7);
                 canvas.drawRect(px, topLine, mLWidth, bottomLine, mPaint);
 
-                float py = bottomLine - pointInfo.value * ratio;
+                Number value = pointInfo.value;
+                float py = (float) (bottomLine - value.doubleValue() * ratio);
 
                 //中心渐变圆点
                 RadialGradient shadow = new RadialGradient(px, py, dp2px(8), mainColor, 0xFFFFFFFF, Shader.TileMode.CLAMP);
@@ -169,7 +174,7 @@ public class GraphicView extends FrameLayout {
                 mPaint.setColor(0xFF2A2A2A);
                 mPaint.setTextSize(sp2px(12));
                 mPaint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawText(String.valueOf(pointInfo.value), px, py - dp2px(10), mPaint);
+                canvas.drawText(String.valueOf(value), px, py - dp2px(10), mPaint);
 
                 px += distance;
                 //最后绘制不计入宽度
@@ -179,6 +184,11 @@ public class GraphicView extends FrameLayout {
             }
             drawBezier(pointFList, canvas);
         }
+    }
+
+    private void resetPaint() {
+        mPaint.reset();
+        mPaint.setAntiAlias(true);
     }
 
 
@@ -247,22 +257,28 @@ public class GraphicView extends FrameLayout {
         LinearGradient linearGradient = new LinearGradient(0F, 0F, 0F, getHeight(), mainColor, 0, Shader.TileMode.CLAMP);
         mPaint.setShader(linearGradient);
         canvas.drawPath(mPath, mPaint);
+
     }
 
     public static class PointInfo {
         String desc;
-        int value;
+        Number value;
 
-        public PointInfo(String desc, int value) {
+        public PointInfo(String desc, Number value) {
             this.desc = desc;
             this.value = value;
         }
+
+        public Number getValue() {
+            return value;
+        }
     }
 
-    public void setData(List<PointInfo> pointsInfo, int maxValue) {
+    public void setData(List<PointInfo> pointsInfo, Number maxValue) {
         this.maxValue = maxValue;
         this.pointsInfo = pointsInfo;
-        invalidate();
+        scrollTo(getPaddingStart(), getScrollY());
+        postInvalidateDelayed(300);
     }
 
 
@@ -276,8 +292,6 @@ public class GraphicView extends FrameLayout {
         return (int) (spValue * fontScale + 0.5f);
     }
 
-
-    private static final String TAG = "gra_tag";
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
@@ -345,19 +359,14 @@ public class GraphicView extends FrameLayout {
                     recycleVelocityTracker();
                 }
                 break;
-            default:
-                break;
         }
         return true;
     }
 
-    private void resetPaint() {
-        mPaint.reset();
-        mPaint.setAntiAlias(true);
-    }
+
     private void initScroll() {
         final ViewConfiguration configuration = ViewConfiguration.get(mContext);
-        mScroller = new OverScroller(getContext());
+        mScroller = new Scroller(getContext());
         mTouchSlop = configuration.getScaledTouchSlop();
         mOverscrollDistance = configuration.getScaledOverscrollDistance();
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
@@ -395,8 +404,8 @@ public class GraphicView extends FrameLayout {
 
     //处理惯性滑动
     public void fling(int velocityX) {
-        mScroller.fling(getScrollX(), getScrollY(), velocityX, 0, 0,
-                getScrollRange(), 0, 0, getScrollRange() / 2, 0);
+        mScroller.fling(getScrollX(),getScrollY(),velocityX,
+                0,0,getScrollRange(),0,0);
     }
 
     @Override
@@ -410,6 +419,7 @@ public class GraphicView extends FrameLayout {
                         mOverflingDistance, 0, false);
 
             }
+            postInvalidateOnAnimation();
         }
     }
 
@@ -434,6 +444,5 @@ public class GraphicView extends FrameLayout {
         }
         return width;
     }
-
 
 }
