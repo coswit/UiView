@@ -14,7 +14,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewParent;
-import android.widget.Scroller;
+import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
 
@@ -87,7 +87,7 @@ public class GraphicView extends View {
     private int mOverscrollDistance;
     private boolean mIsBeingDragged;
     private VelocityTracker mVelocityTracker;
-    private Scroller mScroller;
+    private OverScroller mScroller;
     private int mMinimumVelocity;
     private int mMaximumVelocity;
     int mOverflingDistance;
@@ -348,10 +348,9 @@ public class GraphicView extends View {
                         fling(-initialVelocity);
                     } else {
                         //处理回弹
-                        if (getScrollX() < 0) {
-                            scrollTo(0, getScrollY());
-                        } else if (getScrollX() > getScrollRange()) {
-                            scrollTo(getScrollRange(), getScrollY());
+                        if (mScroller.springBack(getScrollX(), getScrollY(), 0,
+                                getScrollRange(), 0, 0)) {
+                            postInvalidateOnAnimation();
                         }
                     }
                     mActivePointerId = INVALID_POINTER;
@@ -366,7 +365,7 @@ public class GraphicView extends View {
 
     private void initScroll() {
         final ViewConfiguration configuration = ViewConfiguration.get(mContext);
-        mScroller = new Scroller(getContext());
+        mScroller = new OverScroller(getContext());
         mTouchSlop = configuration.getScaledTouchSlop();
         mOverscrollDistance = configuration.getScaledOverscrollDistance();
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
@@ -398,14 +397,23 @@ public class GraphicView extends View {
 
     @Override
     protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-        super.scrollTo(scrollX, scrollY);
+//        super.scrollTo(scrollX, scrollY);
+        if (!mScroller.isFinished()) {
+            if (clampedX) {
+                mScroller.springBack(getScrollX(), getScrollY(), 0, getScrollRange(), 0, 0);
+            } else {
+                super.scrollTo(scrollX, scrollY);
+            }
+        } else {
+            super.scrollTo(scrollX, scrollY);
+        }
     }
 
 
     //处理惯性滑动
     public void fling(int velocityX) {
-        mScroller.fling(getScrollX(),getScrollY(),velocityX,
-                0,0,getScrollRange(),0,0);
+        mScroller.fling(getScrollX(), getScrollY(), velocityX,
+                0, 0, getScrollRange(), 0, 0, OFF_SET, 0);
     }
 
     @Override
@@ -426,9 +434,7 @@ public class GraphicView extends View {
 
     @Override
     protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
-        if (isTouchEvent) {
-            maxOverScrollX += OFF_SET;
-        }
+        maxOverScrollX += OFF_SET;
         return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
     }
 
