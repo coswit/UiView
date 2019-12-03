@@ -6,7 +6,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -111,6 +110,7 @@ public class GraphicView extends View {
     private void initView(Context context) {
         mContext = context;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        setLayerType(LAYER_TYPE_SOFTWARE,null);
         LINE_HEIGHT = dp2px(LINE_HEIGHT);
         textTopDistance = dp2px(textTopDistance);
         descTSize = sp2px(descTSize);
@@ -159,8 +159,8 @@ public class GraphicView extends View {
                 float py = (float) (bottomLine - value.doubleValue() * ratio);
 
                 //中心渐变圆点
-                RadialGradient shadow = new RadialGradient(px, py, dp2px(8), mainColor, 0xFFFFFFFF, Shader.TileMode.CLAMP);
-                mPaint.setShader(shadow);
+//                RadialGradient shadow = new RadialGradient(px, py, dp2px(8), mainColor, 0xFFFFFFFF, Shader.TileMode.CLAMP);
+//                mPaint.setShader(shadow);
                 canvas.drawCircle(px, py, dp2px(8), mPaint);
                 resetPaint();
                 mPaint.setColor(0xFFFFFFFF);

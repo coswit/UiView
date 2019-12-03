@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         GraphicView view = findViewById(R.id.gv);
         ArrayList<GraphicView.PointInfo> infos = new ArrayList<>();
-        for(int i = 0;i<4;i++) {
+        for(int i = 0;i<20;i++) {
             infos.add(new GraphicView.PointInfo("1月",45));
             infos.add(new GraphicView.PointInfo("2月",20));
             infos.add(new GraphicView.PointInfo("3月",12));
