@@ -20,8 +20,6 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static androidx.customview.widget.ViewDragHelper.INVALID_POINTER;
-
 /**
  * @author Created by zhengjing on 2019-10-18.
  */
@@ -82,7 +80,7 @@ public class GraphicView extends View {
      */
     private int mLastMotionX;
     private int mTouchSlop;
-    private int mActivePointerId = INVALID_POINTER;
+//    private int mActivePointerId = INVALID_POINTER;
     private int mOverscrollDistance;
     private boolean mIsBeingDragged;
     private VelocityTracker mVelocityTracker;
@@ -312,12 +310,14 @@ public class GraphicView extends View {
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                mActivePointerId = ev.getPointerId(0);
+//                mActivePointerId = ev.getPointerId(0);
                 mLastMotionX = (int) ev.getX();
                 break;
             case MotionEvent.ACTION_MOVE:
-                final int activePointerIndex = ev.findPointerIndex(mActivePointerId);
-                final int x = (int) ev.getX(activePointerIndex);
+//                final int activePointerIndex = ev.findPointerIndex(mActivePointerId);
+//                final int x = (int) ev.getX(activePointerIndex);
+                final int x = (int) ev.getX();
+
                 int deltaX = mLastMotionX - x;
                 if (!mIsBeingDragged && Math.abs(deltaX) > mTouchSlop) {
                     final ViewParent parent = getParent();
@@ -347,7 +347,7 @@ public class GraphicView extends View {
                 if (mIsBeingDragged) {
                     final VelocityTracker velocityTracker = mVelocityTracker;
                     velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-                    int initialVelocity = (int) velocityTracker.getXVelocity(mActivePointerId);
+                    int initialVelocity = (int) velocityTracker.getXVelocity();
                     mVelocityTracker.addMovement(ev);
                     if ((Math.abs(initialVelocity) > mMinimumVelocity)) {
                         fling(-initialVelocity);
@@ -358,7 +358,7 @@ public class GraphicView extends View {
                             postInvalidateOnAnimation();
                         }
                     }
-                    mActivePointerId = INVALID_POINTER;
+//                    mActivePointerId = INVALID_POINTER;
                     mIsBeingDragged = false;
                     recycleVelocityTracker();
                 }
