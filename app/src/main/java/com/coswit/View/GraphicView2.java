@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewParent;
 import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
@@ -23,7 +22,7 @@ import java.util.List;
 /**
  * @author Created by zhengjing on 2019-10-18.
  */
-public class GraphicView extends View {
+public class GraphicView2 extends View {
 
     /**
      * 主填充色
@@ -80,7 +79,7 @@ public class GraphicView extends View {
      */
     private int mLastMotionX;
     private int mTouchSlop;
-//    private int mActivePointerId = INVALID_POINTER;
+    //    private int mActivePointerId = INVALID_POINTER;
     private int mOverscrollDistance;
     private boolean mIsBeingDragged;
     private VelocityTracker mVelocityTracker;
@@ -91,15 +90,15 @@ public class GraphicView extends View {
     //最大回弹距离
     private static final int OFF_SET = 200;
 
-    public GraphicView(Context context) {
+    public GraphicView2(Context context) {
         this(context, null);
     }
 
-    public GraphicView(Context context, @Nullable AttributeSet attrs) {
+    public GraphicView2(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public GraphicView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public GraphicView2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context);
     }
@@ -108,7 +107,7 @@ public class GraphicView extends View {
     private void initView(Context context) {
         mContext = context;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        setLayerType(LAYER_TYPE_SOFTWARE,null);
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
         LINE_HEIGHT = dp2px(LINE_HEIGHT);
         textTopDistance = dp2px(textTopDistance);
         descTSize = sp2px(descTSize);
@@ -293,80 +292,40 @@ public class GraphicView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        mVelocityTracker.addMovement(ev);
         int action = ev.getAction();
+        float x = ev.getX();
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                initOrResetVelocityTracker();
-                if ((mIsBeingDragged = !mScroller.isFinished())) {
-                    final ViewParent parent = getParent();
-                    if (parent != null) {
-                        parent.requestDisallowInterceptTouchEvent(true);
-                    }
-                }
-                /*
-                 * If being flinged and user touches, stop the fling. isFinished
-                 * will be false if being flinged.
-                 */
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-//                mActivePointerId = ev.getPointerId(0);
-                mLastMotionX = (int) ev.getX();
                 break;
             case MotionEvent.ACTION_MOVE:
-//                final int activePointerIndex = ev.findPointerIndex(mActivePointerId);
-//                final int x = (int) ev.getX(activePointerIndex);
-                final int x = (int) ev.getX();
-
-                int deltaX = mLastMotionX - x;
-                if (!mIsBeingDragged && Math.abs(deltaX) > mTouchSlop) {
-                    final ViewParent parent = getParent();
-                    if (parent != null) {
-                        parent.requestDisallowInterceptTouchEvent(true);
-                    }
-                    mIsBeingDragged = true;
-                    if (deltaX > 0) {
-                        deltaX -= mTouchSlop;
-                    } else {
-                        deltaX += mTouchSlop;
-                    }
-                }
-                if (mIsBeingDragged) {
-                    mVelocityTracker.addMovement(ev);
-                    mLastMotionX = x;
-                    int scrollRange = getScrollRange();
-                    if (overScrollBy(deltaX, 0, getScrollX(), 0, scrollRange, 0,
-                            mOverscrollDistance, 0, true)) {
-                        mVelocityTracker.clear();
-                    }
-
-                }
+                int dx = (int) (x - mLastMotionX);
+                scrollBy(-dx, 0);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (mIsBeingDragged) {
-                    final VelocityTracker velocityTracker = mVelocityTracker;
-                    velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-                    int initialVelocity = (int) velocityTracker.getXVelocity();
-                    mVelocityTracker.addMovement(ev);
-                    if ((Math.abs(initialVelocity) > mMinimumVelocity)) {
-                        fling(-initialVelocity);
-                    } else {
-                        //处理回弹
-                        if (mScroller.springBack(getScrollX(), getScrollY(), 0,
-                                getScrollRange(), 0, 0)) {
-                            postInvalidateOnAnimation();
-                        }
-                    }
-//                    mActivePointerId = INVALID_POINTER;
-                    mIsBeingDragged = false;
-                    recycleVelocityTracker();
+//            default:
+                int scrollX = getScrollX();
+                int scrollRange = getScrollRange();
+                if (scrollX < 0) {
+                    smoothScrollBy(-scrollX, 0);
+                }else if(scrollX> scrollRange){
+                    smoothScrollBy(scrollRange -scrollX,0);
                 }
+                mVelocityTracker.clear();
                 break;
         }
+        mLastMotionX = (int) x;
         return true;
     }
 
+    private void smoothScrollBy(int dx, int dy) {
+        mScroller.startScroll(getScrollX(), 0, dx, 0, 500);
+        invalidate();
+    }
 
     private void initScroll() {
         final ViewConfiguration configuration = ViewConfiguration.get(mContext);
@@ -377,6 +336,7 @@ public class GraphicView extends View {
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
         mOverflingDistance = configuration.getScaledOverflingDistance();
         setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
+        initOrResetVelocityTracker();
     }
 
     private int getScrollRange() {
@@ -400,61 +360,15 @@ public class GraphicView extends View {
         }
     }
 
-    @Override
-    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-//        super.scrollTo(scrollX, scrollY);
-        if (!mScroller.isFinished()) {
-            if (clampedX) {
-                mScroller.springBack(getScrollX(), getScrollY(), 0, getScrollRange(), 0, 0);
-            } else {
-                super.scrollTo(scrollX, scrollY);
-            }
-        } else {
-            super.scrollTo(scrollX, scrollY);
-        }
-    }
 
-
-    //处理惯性滑动
-    public void fling(int velocityX) {
-        mScroller.fling(getScrollX(), getScrollY(), velocityX,
-                0, 0, getScrollRange(), 0, 0, OFF_SET, 0);
-        postInvalidateOnAnimation();
-    }
 
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
-            int oldX = getScrollX();
-            int x = mScroller.getCurrX();
-            if (oldX != x) {
-                final int range = getScrollRange();
-                overScrollBy(x - oldX, 0, oldX, 0, range, 0,
-                        mOverflingDistance, 0, false);
-
-            }
-            postInvalidateOnAnimation();
+            scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
+            postInvalidate();
         }
     }
 
-
-    @Override
-    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
-        maxOverScrollX += OFF_SET;
-        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
-    }
-
-
-    @Override
-    protected int computeHorizontalScrollRange() {
-        int scrollX = getScrollX();
-        int width = getWidth();
-        if (scrollX <= 0) {
-            return width - scrollX + OFF_SET;
-        } else if (scrollX >= getScrollRange()) {
-            return width + scrollX;
-        }
-        return width;
-    }
 
 }
