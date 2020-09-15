@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.coswit.View.CircleNumView;
 import com.coswit.View.GraphicView;
+import com.coswit.nestedscroll.NestedScrollActivity;
 import com.coswit.scroller.ScrollerTestActivity;
 
 import java.util.ArrayList;
@@ -22,6 +23,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, ScrollerTestActivity.class));
+            }
+        });
+
+        findViewById(R.id.progress).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, NestedScrollActivity.class));
             }
         });
 

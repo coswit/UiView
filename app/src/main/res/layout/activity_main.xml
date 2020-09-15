@@ -98,6 +98,7 @@
 <!--    </com.coswit.rebackScroll.ReboundHScrollView>-->
 
     <com.coswit.View.VProgressBar
+        android:id="@+id/progress"
         android:layout_gravity="center"
         android:layout_width="45dp"
         android:layout_height="23dp"/>
