@@ -150,7 +150,7 @@ public class DragLayout extends LinearLayout {
         switch (actionMasked) {
             case MotionEvent.ACTION_DOWN:
                 mLastMotionY = (int) ev.getY();
-                break;
+                return true;
             case MotionEvent.ACTION_MOVE:
                 final int y = (int) ev.getY();
                 int deltaY = mLastMotionY - y;

@@ -11,14 +11,35 @@
 
     <RelativeLayout
         android:id="@+id/topview"
+        android:background="#B05D5D"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="500dp">
 
-        <TextView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="#B05D5D"
-            android:text="展示" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:id="@+id/tv_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFC107"
+                android:ellipsize="end"
+                 />
+
+            <TextView
+                android:id="@+id/tv_hint"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_desc"
+                app:layout_constraintEnd_toEndOf="@+id/tv_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="5dp"
+                android:text="3333"
+                android:textColor="#3F51B5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 
 
