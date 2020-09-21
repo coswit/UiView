@@ -12,16 +12,26 @@ import androidx.annotation.Nullable;
 /**
  * @author Created by zhengjing on 2019-10-24.
  */
-public class ShadowLinearLayout  extends LinearLayout {
+public class ShadowLinearLayout extends LinearLayout {
 
     private Paint mPaint;
+    private Paint mLocationPaint;
+    //阴影半径
+    private float shadowRadius = 10f;
+    //模糊度半径
+    private float blurRadius = 20f;
+    //背景色
+    private int bgColor = Color.WHITE;
+
+    //阴影颜色
+    private int shadowColor = Color.parseColor("#33333333");
 
     public ShadowLinearLayout(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public ShadowLinearLayout(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public ShadowLinearLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -29,10 +39,11 @@ public class ShadowLinearLayout  extends LinearLayout {
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         setWillNotDraw(false);
         mPaint = new Paint();
-        setLayerType(LAYER_TYPE_SOFTWARE,null);
+        mLocationPaint = new Paint();
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
 
 
     }
@@ -40,9 +51,17 @@ public class ShadowLinearLayout  extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        Color.BLACK 0xFF000000
-        mPaint.setShadowLayer(40,10,10,0x33666666);
-        mPaint.setColor(Color.WHITE);
-        canvas.drawRect(10,10,getWidth()-10,getHeight()-10,mPaint);
+
+//        mPaint.setMaskFilter(new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL));
+//        mPaint.setColor(shadowColor);
+//        mPaint.setAntiAlias(true);
+//
+//        RectF shadowRect = new RectF(0, 0, getWidth(), getHeight());
+//
+//        RectF locationRect = new RectF(10, 10, getWidth()-10, getHeight()-10);
+//        mLocationPaint.setColor(bgColor);
+//        mLocationPaint.setAntiAlias(true);
+//        canvas.drawRoundRect(shadowRect, shadowRadius, shadowRadius, mPaint);
+//        canvas.drawRoundRect(locationRect, shadowRadius, shadowRadius, mLocationPaint);
     }
 }

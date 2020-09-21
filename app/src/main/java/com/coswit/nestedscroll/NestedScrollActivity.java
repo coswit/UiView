@@ -1,13 +1,10 @@
 package com.coswit.nestedscroll;
 
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -22,18 +19,21 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
 
     private ViewPager viewPager;
     SlidingTabView slidingtablayout;
+    private DragLayout dragLayout;
+    View mTopView;
     private ArrayList<Fragment> fragments = new ArrayList<>();
     private String[] mTitles = {"介绍", "课程", "评价", "动态"};
-
+    private ShrinkableText shrink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nested_scroll);
 
-
         viewPager = findViewById(R.id.viewpager);
+        dragLayout = findViewById(R.id.layout);
         slidingtablayout = findViewById(R.id.slidingtablayout);
+        mTopView = findViewById(R.id.topview);
         init();
 
         String s =
@@ -51,6 +51,8 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
     }
 
     private void init() {
+        shrink = findViewById(R.id.shrink);
+
         fragments.add(new PagerFragment());
         fragments.add(new PagerRecylerFragment());
         fragments.add(new PagerRecylerFragment());
@@ -60,6 +62,19 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
         slidingtablayout.setViewPager(viewPager, mTitles);
         TextView tv = new TextView(this);
         tv.setText("");
+        DragLayout layout = findViewById(R.id.layout);
+        shrink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dragLayout.scrolledUp();
+            }
+        });
+        layout.setDragListener(new DragLayout.DragChangeListener() {
+            @Override
+            public void onDragChanged(float alpha) {
+                shrink.setAlpha(alpha);
+            }
+        });
 
     }
 
@@ -73,62 +88,8 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
     public static final int MAX = 2;
 
     private void measuredText(final String content) {
-        final TextView tv = findViewById(R.id.tv_desc);
-        final TextView hint = findViewById(R.id.tv_hint);
-        hint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hint.setSelected(!hint.isSelected());
-                tv.requestLayout();
-                isMeasured = false;
-            }
-        });
-        tv.setText(content);
 
-        tv.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (isMeasured) {
-                    return;
-                }
-                if (!initial) {
-                    lineCount = tv.getLineCount();
-                    if (lineCount > MAX) {
-                        Layout layout = tv.getLayout();
-                        lineEnd = layout.getLineEnd(1);
-                        float lastLineWidth = layout.getLineWidth(Math.max(lineCount - 1, 0));
-                        int width = tv.getMeasuredWidth();
-                        percent = lastLineWidth / width;
-                    }
-                    initial = true;
-                }
-                if (lineCount > MAX) {
-                    hint.setVisibility(View.VISIBLE);
-                    if (!hint.isSelected()) {
-                        tv.setLines(2);
-                        String part = content.substring(0, Math.max(lineEnd - 2, 0)) + "...";
-                        tv.setText(part);
-                        hint.setText("全部");
-                        hint.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                                ContextCompat.getDrawable(NestedScrollActivity.this, R.mipmap.arrow_down_teacher), null);
-                    } else {
-                        //最后一行文字剩余空白
-                        boolean isOut = percent > 0.86f;
-                        tv.setLines(isOut ? lineCount + 1 : lineCount);
-                        tv.setText(content);
-                        hint.setText("收起");
-                        hint.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                                ContextCompat.getDrawable(NestedScrollActivity.this, R.mipmap.arrow_up__teacher), null);
-                    }
-                } else {
-                    tv.setText(content);
-                    hint.setVisibility(View.GONE);
-                }
-
-                isMeasured = true;
-            }
-        });
-
+        shrink.setText(content);
     }
 
     @Override

@@ -37,6 +37,7 @@ public class DragLayout extends LinearLayout {
 
     private boolean isTopHidden;
     private boolean mDragging = false;
+    private DragChangeListener listener;
 
 
     public DragLayout(Context context) {
@@ -83,7 +84,14 @@ public class DragLayout extends LinearLayout {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
         mTopHeight = mTopView.getMeasuredHeight();
+        Log.i(TAG, "onSizeChanged: " + mTopHeight);
     }
 
     @Override
@@ -108,8 +116,8 @@ public class DragLayout extends LinearLayout {
                 if (Math.abs(deltaY) > mTouchSlop) {
                     mDragging = true;
                     boolean interceptEvent = isInterceptEvent(deltaY);
-                    Log.i(TAG, "onInterceptTouchEvent: " + interceptEvent + "::"
-                            + deltaY + "..." + isTopHidden + "::" + getCurrentScrollView().canScrollVertically(-1));
+//                    Log.i(TAG, "onInterceptTouchEvent: " + interceptEvent + "::"
+//                            + deltaY + "..." + isTopHidden + "::" + getCurrentScrollView().canScrollVertically(-1));
                     if (interceptEvent) {
                         initVelocityTrackerIfNotExists();
                         mVelocityTracker.addMovement(ev);
@@ -204,6 +212,13 @@ public class DragLayout extends LinearLayout {
         }
         super.scrollTo(x, y);
         isTopHidden = getScrollY() == mTopHeight;
+        if (listener != null) {
+            float alpha = 1.0f;
+            if (mTopHeight > 0) {
+                alpha = y * 1.0f / mTopHeight;
+            }
+            listener.onDragChanged(Math.min(alpha, 1.0f));
+        }
     }
 
 
@@ -230,5 +245,19 @@ public class DragLayout extends LinearLayout {
     public void fling(int velocityY) {
         mScroller.fling(0, getScrollY(), 0, velocityY, 0, 0, 0, mTopHeight);
         invalidate();
+    }
+
+    public void scrolledUp() {
+        mScroller.fling(0, getScrollY(), 0, 4600, 0, 0, 0, mTopHeight);
+        invalidate();
+    }
+
+    public void setDragListener(DragChangeListener listener) {
+        this.listener = listener;
+    }
+
+
+    interface DragChangeListener {
+        void onDragChanged(float alpha);
     }
 }
