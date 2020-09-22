@@ -20,17 +20,22 @@
            android:id="@+id/shrink"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"/>
-        <FrameLayout
+<!--        <FrameLayout-->
 
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent">-->
+
+<!--            <com.coswit.View.ShadowLinearLayout-->
+<!--                android:background="#fff"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_width="100dp"-->
+<!--                android:layout_height="300dp"/>-->
+<!--        </FrameLayout>-->
+        <com.coswit.View.GridImageView
+            android:padding="10dp"
+            android:background="#CDDC39"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.coswit.View.ShadowLinearLayout
-                android:background="#fff"
-                android:layout_gravity="center"
-                android:layout_width="100dp"
-                android:layout_height="300dp"/>
-        </FrameLayout>
+            android:layout_height="wrap_content"/>
     </RelativeLayout>
 
 
