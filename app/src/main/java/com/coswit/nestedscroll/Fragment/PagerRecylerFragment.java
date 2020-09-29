@@ -31,6 +31,7 @@ public class PagerRecylerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_pager_recyler, null);
         recyclerView = root.findViewById(R.id.innerscrollview);
+        recyclerView.setNestedScrollingEnabled(false);
         return root;
     }
 

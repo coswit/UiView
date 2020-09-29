@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.text.Layout;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -119,7 +118,6 @@ public class ShrinkableText extends ConstraintLayout {
             text.setText(mContent);
             hint.setVisibility(View.GONE);
         }
-        Log.i("DragLayout  shrink", text.getMeasuredHeight() + ": " + lineCount);
 
         isMeasured = true;
     }

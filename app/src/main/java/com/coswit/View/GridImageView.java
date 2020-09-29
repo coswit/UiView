@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -64,7 +63,7 @@ public class GridImageView extends ViewGroup {
         int paddingStart = getPaddingStart();
         int paddingTop = getPaddingTop();
         //4张时固定位置
-        if (childCount == maximum + 1) {
+        if (childCount == maximum + 1 && !isSpread) {
             int top = paddingTop;
             int start = paddingStart;
             View child0 = getChildAt(0);
@@ -87,7 +86,6 @@ public class GridImageView extends ViewGroup {
                 int start = paddingStart + cubeSize * column + gapSize * column;
                 int top = paddingTop + cubeSize * Math.max(0, row - 1) + gapSize * Math.max(0, row - 1);
                 child.layout(start, top, start + cubeSize, top + cubeSize);
-                Log.i("grid", (start) + ":start||top:" + (top));
             }
         }
     }

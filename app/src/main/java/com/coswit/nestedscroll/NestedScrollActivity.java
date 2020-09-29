@@ -19,7 +19,7 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
 
     private ViewPager viewPager;
     SlidingTabView slidingtablayout;
-    private DragLayout dragLayout;
+//    private DragLayout dragLayout;
     View mTopView;
     private ArrayList<Fragment> fragments = new ArrayList<>();
     private String[] mTitles = {"介绍", "课程", "评价", "动态"};
@@ -31,7 +31,7 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
         setContentView(R.layout.activity_nested_scroll);
 
         viewPager = findViewById(R.id.viewpager);
-        dragLayout = findViewById(R.id.layout);
+//        dragLayout = findViewById(R.id.layout);
         slidingtablayout = findViewById(R.id.slidingtablayout);
         mTopView = findViewById(R.id.topview);
         init();
@@ -53,8 +53,8 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
     private void init() {
         shrink = findViewById(R.id.shrink);
 
-        fragments.add(new PagerFragment());
         fragments.add(new PagerRecylerFragment());
+        fragments.add(new PagerFragment());
         fragments.add(new PagerRecylerFragment());
         fragments.add(new PagerRecylerFragment());
 
@@ -62,19 +62,19 @@ public class NestedScrollActivity extends AppCompatActivity implements ViewPager
         slidingtablayout.setViewPager(viewPager, mTitles);
         TextView tv = new TextView(this);
         tv.setText("");
-        DragLayout layout = findViewById(R.id.layout);
-        shrink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dragLayout.scrolledUp();
-            }
-        });
-        layout.setDragListener(new DragLayout.DragChangeListener() {
-            @Override
-            public void onDragChanged(float alpha) {
-                shrink.setAlpha(alpha);
-            }
-        });
+//        DragLayout layout = findViewById(R.id.layout);
+//        shrink.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                dragLayout.scrolledUp();
+//            }
+//        });
+//        layout.setDragListener(new DragLayout.DragChangeListener() {
+//            @Override
+//            public void onDragChanged(float alpha) {
+//                shrink.setAlpha(alpha);
+//            }
+//        });
 
     }
 

@@ -3,6 +3,7 @@ package com.coswit.nestedscroll;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -22,27 +23,33 @@ import com.coswit.R;
 /**
  * @author Created by zhengjing on 2020/9/24.
  */
-public class StickyNavLayout extends LinearLayout implements NestedScrollingParent {
+public class DragerLayout extends LinearLayout implements NestedScrollingParent {
+    private static final String TAG = "StickyNavLayout";
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+        Log.e(TAG, "onStartNestedScroll");
         return true;
     }
 
     @Override
     public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes) {
+        Log.e(TAG, "onNestedScrollAccepted");
     }
 
     @Override
     public void onStopNestedScroll(View target) {
+        Log.e(TAG, "onStopNestedScroll");
     }
 
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+        Log.e(TAG, "onNestedScroll");
     }
 
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
+        Log.e(TAG, "onNestedPreScroll");
         boolean hiddenTop = dy > 0 && getScrollY() < mTopViewHeight;
         boolean showTop = dy < 0 && getScrollY() >= 0 && !ViewCompat.canScrollVertically(target, -1);
 
@@ -81,6 +88,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
 
     @Override
     public int getNestedScrollAxes() {
+        Log.e(TAG, "getNestedScrollAxes");
         return 0;
     }
 
@@ -160,7 +168,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
     private float mLastY;
     private boolean mDragging;
 
-    public StickyNavLayout(Context context, AttributeSet attrs) {
+    public DragerLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(LinearLayout.VERTICAL);
 
