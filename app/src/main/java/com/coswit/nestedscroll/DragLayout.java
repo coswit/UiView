@@ -2,6 +2,7 @@ package com.coswit.nestedscroll;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -112,7 +113,7 @@ public class DragLayout extends LinearLayout {
             return true;
         }
         final int actionMasked = ev.getActionMasked();
-        switch (action & MotionEvent.ACTION_MASK) {
+        switch (actionMasked & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_MOVE:
                 final int activePointerId = mActivePointerId;
                 if (activePointerId == INVALID_POINTER) {
@@ -123,22 +124,24 @@ public class DragLayout extends LinearLayout {
                     break;
                 }
                 final int y = (int) ev.getY(pointerIndex);
+                final int x = (int) ev.getX(pointerIndex);
                 int deltaY = mLastMotionY - y;
                 final int yDiff = Math.abs(deltaY);
+                final int xDiff = Math.abs(mLastMotionX - x);
                 boolean interceptEvent = isInterceptEvent(deltaY);
-                if (yDiff > mTouchSlop && interceptEvent) {
-                    mIsBeingDragged = true;
-                    mLastMotionY = y;
-                    initVelocityTrackerIfNotExists();
-                    mVelocityTracker.addMovement(ev);
+                if (yDiff > mTouchSlop || yDiff > xDiff) {
+                    if (interceptEvent) {
+                        mIsBeingDragged = true;
+                        mLastMotionY = y;
+                        initVelocityTrackerIfNotExists();
+                        mVelocityTracker.addMovement(ev);
+                    }
                 }
-//                if (interceptEvent) {
-//                    return true;
-//                }
                 break;
 
             case MotionEvent.ACTION_DOWN:
                 mLastMotionY = (int) ev.getY();
+                mLastMotionX = (int) ev.getX();
                 mActivePointerId = ev.getPointerId(0);
                 initOrResetVelocityTracker();
                 mVelocityTracker.addMovement(ev);
@@ -155,7 +158,6 @@ public class DragLayout extends LinearLayout {
             default:
                 break;
         }
-//        return super.onInterceptTouchEvent(ev);
         return mIsBeingDragged;
     }
 
@@ -164,8 +166,20 @@ public class DragLayout extends LinearLayout {
      */
     private boolean isInterceptEvent(int deltaY) {
         View currentScrollView = getCurrentScrollView();
+//        if (currentScrollView != null) {
+//            return !isTopHidden || deltaY < 0 && (!currentScrollView.canScrollVertically(-1)) && isTopHidden;
+//        }
         if (currentScrollView != null) {
-            return !isTopHidden || deltaY < 0 && (!currentScrollView.canScrollVertically(-1)) && isTopHidden;
+            boolean canScrollDown = currentScrollView.canScrollVertically(-1);
+            if (isTopHidden) {
+                return deltaY < 0 && !canScrollDown;
+            } else {
+                if (deltaY < 0 && canScrollDown) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -221,10 +235,12 @@ public class DragLayout extends LinearLayout {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                final VelocityTracker velocityTracker = mVelocityTracker;
+                velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+                int initialVelocity = (int) velocityTracker.getYVelocity(mActivePointerId);
+
+                Log.i(TAG, "onTouchEvent: " + initialVelocity + ":::" + mActivePointerId);
                 if (mIsBeingDragged) {
-                    final VelocityTracker velocityTracker = mVelocityTracker;
-                    velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-                    int initialVelocity = (int) velocityTracker.getYVelocity(mActivePointerId);
                     if (Math.abs(initialVelocity) > mMinimumVelocity) {
                         fling(-initialVelocity);
                     }
@@ -241,8 +257,6 @@ public class DragLayout extends LinearLayout {
             case MotionEvent.ACTION_POINTER_UP:
                 onSecondaryPointerUp(ev);
                 mLastMotionY = (int) ev.getY(ev.findPointerIndex(mActivePointerId));
-                break;
-            default:
                 break;
         }
 
@@ -315,8 +329,11 @@ public class DragLayout extends LinearLayout {
     }
 
     public void fling(int velocityY) {
-        mScroller.fling(0, getScrollY(), 0, velocityY, 0, 0, 0, mTopHeight);
+        Log.i(TAG, "fling: " + velocityY + ":::" + mMinimumVelocity);
+        mScroller.fling(0, getScrollY(), 0, velocityY, 0,
+                0, 0, mTopHeight);
         invalidate();
+//        postInvalidateOnAnimation();
     }
 
     public void scrolledUp() {
