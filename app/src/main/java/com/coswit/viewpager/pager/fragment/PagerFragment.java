@@ -1,4 +1,4 @@
-package com.coswit.nestedscroll.Fragment;
+package com.coswit.viewpager.pager.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

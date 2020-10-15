@@ -1,4 +1,4 @@
-package com.coswit.nestedscroll.Fragment;
+package com.coswit.viewpager.pager.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.coswit.R;
+import com.coswit.viewpager.pager.Bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * @author Created by zhengjing on 2020/9/12.
  */
-public class PagerRecylerFragment extends Fragment {
+public class PagerRecyclerFragment extends Fragment {
 
 
     private RecyclerView recyclerView;
@@ -49,21 +50,7 @@ public class PagerRecylerFragment extends Fragment {
 
     }
 
-    class Bean{
-        private String name;
 
-        public Bean(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
 
     class Adapter extends BaseQuickAdapter<Bean, BaseViewHolder>{
 

@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
 
-import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.coswit.R;
+import com.coswit.viewpager.pager.fragment.FragmentPageAdapter;
+import com.coswit.viewpager.pager.view.ViewPagerAdapter;
 
 /**
  * @author Created by zhengjing on 2020/9/12.
@@ -75,12 +76,18 @@ public class DragLayout extends LinearLayout {
     }
 
     private View getCurrentScrollView() {
+        View curView = null;
         int currentItem = mViewPager.getCurrentItem();
         PagerAdapter adapter = mViewPager.getAdapter();
-        Fragment fragment = (Fragment) adapter.instantiateItem(mViewPager, currentItem);
-        View view = fragment.getView();
-        if (view != null) {
-            return view.findViewById(R.id.innerscrollview);
+        if (adapter instanceof FragmentPageAdapter) {
+            curView = ((FragmentPageAdapter) adapter).getItem(currentItem).getView();
+        }
+        if (adapter instanceof ViewPagerAdapter) {
+            curView = ((ViewPagerAdapter) adapter).getItem(currentItem);
+
+        }
+        if (curView != null) {
+            return curView.findViewById(R.id.innerscrollview);
         }
         return null;
     }
@@ -112,6 +119,10 @@ public class DragLayout extends LinearLayout {
         if ((action == MotionEvent.ACTION_MOVE && (mIsBeingDragged))) {
             return true;
         }
+
+        if (mVelocityTracker == null) {
+            mVelocityTracker = VelocityTracker.obtain();
+        }
         final int actionMasked = ev.getActionMasked();
         switch (actionMasked & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_MOVE:
@@ -133,8 +144,6 @@ public class DragLayout extends LinearLayout {
                     if (interceptEvent) {
                         mIsBeingDragged = true;
                         mLastMotionY = y;
-                        initVelocityTrackerIfNotExists();
-                        mVelocityTracker.addMovement(ev);
                     }
                 }
                 break;
@@ -143,8 +152,6 @@ public class DragLayout extends LinearLayout {
                 mLastMotionY = (int) ev.getY();
                 mLastMotionX = (int) ev.getX();
                 mActivePointerId = ev.getPointerId(0);
-                initOrResetVelocityTracker();
-                mVelocityTracker.addMovement(ev);
                 mScroller.computeScrollOffset();
                 mIsBeingDragged = !mScroller.isFinished();
                 break;
@@ -153,7 +160,7 @@ public class DragLayout extends LinearLayout {
             case MotionEvent.ACTION_CANCEL:
                 mIsBeingDragged = false;
                 mActivePointerId = INVALID_POINTER;
-                recycleVelocityTracker();
+                mVelocityTracker.clear();
                 break;
             default:
                 break;
@@ -187,7 +194,10 @@ public class DragLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        initVelocityTrackerIfNotExists();
+        if (mVelocityTracker == null) {
+            mVelocityTracker = VelocityTracker.obtain();
+        }
+        mVelocityTracker.addMovement(ev);
         final int actionMasked = ev.getActionMasked();
         switch (actionMasked) {
             case MotionEvent.ACTION_DOWN:
@@ -228,7 +238,6 @@ public class DragLayout extends LinearLayout {
                 if (mIsBeingDragged) {
                     mActivePointerId = INVALID_POINTER;
                     mIsBeingDragged = false;
-                    recycleVelocityTracker();
                 }
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
@@ -239,7 +248,6 @@ public class DragLayout extends LinearLayout {
                 velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                 int initialVelocity = (int) velocityTracker.getYVelocity(mActivePointerId);
 
-                Log.i(TAG, "onTouchEvent: " + initialVelocity + ":::" + mActivePointerId);
                 if (mIsBeingDragged) {
                     if (Math.abs(initialVelocity) > mMinimumVelocity) {
                         fling(-initialVelocity);
@@ -247,6 +255,7 @@ public class DragLayout extends LinearLayout {
                     mActivePointerId = INVALID_POINTER;
                     mIsBeingDragged = false;
                 }
+                velocityTracker.clear();
                 break;
             case MotionEvent.ACTION_POINTER_DOWN: {
                 final int index = ev.getActionIndex();
@@ -307,26 +316,11 @@ public class DragLayout extends LinearLayout {
         params.height = getMeasuredHeight() - mTabView.getMeasuredHeight();
     }
 
-    private void initVelocityTrackerIfNotExists() {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-    }
 
-    private void recycleVelocityTracker() {
-        if (mVelocityTracker != null) {
-            mVelocityTracker.recycle();
-            mVelocityTracker = null;
-        }
-    }
 
-    private void initOrResetVelocityTracker() {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        } else {
-            mVelocityTracker.clear();
-        }
-    }
+
+
+
 
     public void fling(int velocityY) {
         Log.i(TAG, "fling: " + velocityY + ":::" + mMinimumVelocity);
