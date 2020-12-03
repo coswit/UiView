@@ -103,7 +103,7 @@ public class VProgressBar extends View {
         Path path = new Path();
 
         rectf.right = w - lineWidth;
-//        float[] radiiRight = {radius, radius, radius, radius, radius, radius, radius, radius};
+        float[] radiiRight = {radius, radius, radius, radius, radius, radius, radius, radius};
         path.addRoundRect(rectf, radius, radius, Path.Direction.CW);
 
         Path path2 = new Path();
@@ -112,7 +112,6 @@ public class VProgressBar extends View {
         path.op(path2, Path.Op.INTERSECT);
         mPaint.setColor(shadowColor);
         canvas.drawPath(path,mPaint);
-
 
         //文字绘制
         mPaint.setColor(mainColor);
