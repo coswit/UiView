@@ -25,11 +25,6 @@
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="match_parent">-->
 
-<!--            <com.coswit.View.ShadowLinearLayout-->
-<!--                android:background="#fff"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:layout_width="100dp"-->
-<!--                android:layout_height="300dp"/>-->
 <!--        </FrameLayout>-->
         <com.coswit.View.GridImageView
             android:padding="10dp"

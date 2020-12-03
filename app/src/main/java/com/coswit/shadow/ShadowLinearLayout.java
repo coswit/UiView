@@ -1,9 +1,11 @@
-package com.coswit.View;
+package com.coswit.shadow;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
@@ -24,7 +26,8 @@ public class ShadowLinearLayout extends LinearLayout {
     private int bgColor = Color.WHITE;
 
     //阴影颜色
-    private int shadowColor = Color.parseColor("#33333333");
+    private int shadowColor = Color.TRANSPARENT;
+    private int fillColor = Color.parseColor("#FFF5F6F7");
 
     public ShadowLinearLayout(Context context) {
         this(context, null);
@@ -43,7 +46,7 @@ public class ShadowLinearLayout extends LinearLayout {
         setWillNotDraw(false);
         mPaint = new Paint();
         mLocationPaint = new Paint();
-        setLayerType(LAYER_TYPE_SOFTWARE, null);
+//        setLayerType(LAYER_TYPE_SOFTWARE, null);
 
 
     }
@@ -51,17 +54,16 @@ public class ShadowLinearLayout extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mPaint.setColor(0xFFFFFFFF);
+        mPaint.setAntiAlias(true);
+        mPaint.setShadowLayer(18,0,35,0x32939CA5);
+//        mPaint.setShadowLayer(25,0,15,Color.RED);
 
-//        mPaint.setMaskFilter(new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL));
-//        mPaint.setColor(shadowColor);
-//        mPaint.setAntiAlias(true);
-//
-//        RectF shadowRect = new RectF(0, 0, getWidth(), getHeight());
-//
-//        RectF locationRect = new RectF(10, 10, getWidth()-10, getHeight()-10);
-//        mLocationPaint.setColor(bgColor);
-//        mLocationPaint.setAntiAlias(true);
-//        canvas.drawRoundRect(shadowRect, shadowRadius, shadowRadius, mPaint);
-//        canvas.drawRoundRect(locationRect, shadowRadius, shadowRadius, mLocationPaint);
+
+        RectF shadowRect = new RectF(100, 100, getWidth()-100, getHeight()-100);
+
+        Path  path = new Path();
+        path.addRoundRect(shadowRect,20,20, Path.Direction.CCW);
+        canvas.drawPath(path,mPaint);
     }
 }

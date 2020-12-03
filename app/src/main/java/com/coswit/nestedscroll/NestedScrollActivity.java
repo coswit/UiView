@@ -79,7 +79,6 @@ public class NestedScrollActivity extends AppCompatActivity {
         views.add(new PagerView(this));
         views.add(new PagerRecyclerView(this));
         viewPager.setAdapter(new ViewPagerAdapter(views));
-
 //        viewPager.setOffscreenPageLimit(views.size());
     }
 

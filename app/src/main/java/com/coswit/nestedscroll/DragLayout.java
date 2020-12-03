@@ -291,13 +291,20 @@ public class DragLayout extends LinearLayout {
 
     @Override
     public void scrollTo(int x, int y) {
+        Log.i(TAG, "scrollTo: " + y);
         if (y > mTopHeight) {
             y = mTopHeight;
         }
-        if (y < 0) {
-            y = 0;
+        if (y < -200) {
+            y = -200;
         }
         super.scrollTo(x, y);
+        if (y < 0 && mScroller.springBack(0, y, 0, 0, 0, 0)) {
+            postInvalidate();
+        }
+//        if (y > mTopHeight) {
+//            mScroller.springBack(0,y,0,0,0,mTopHeight);
+//        }
         isTopHidden = getScrollY() == mTopHeight;
         if (listener != null) {
             float alpha = 1.0f;
@@ -315,11 +322,6 @@ public class DragLayout extends LinearLayout {
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
         params.height = getMeasuredHeight() - mTabView.getMeasuredHeight();
     }
-
-
-
-
-
 
 
     public void fling(int velocityY) {
